@@ -392,8 +392,12 @@ func (r *PlaceDetailsRequest) params() url.Values {
 		q.Set("fields", strings.Join(placeDetailsFieldMasksAsStringArray(r.Fields), ","))
 	}
 
-	if st := uuid.UUID(r.SessionToken).String(); st != "00000000-0000-0000-0000-000000000000" {
-		q.Set("sessiontoken", st)
+	if r.SessionTokenString != "" {
+		q.Set("sessiontoken", r.SessionTokenString)
+	} else {
+		if st := uuid.UUID(r.SessionToken).String(); st != "00000000-0000-0000-0000-000000000000" {
+			q.Set("sessiontoken", st)
+		}
 	}
 
 	if r.Region != "" {
@@ -417,7 +421,8 @@ type PlaceDetailsRequest struct {
 	Fields []PlaceDetailsFieldMask
 	// SessionToken is a token that marks this request as part of a Place Autocomplete
 	// Session. Optional.
-	SessionToken PlaceAutocompleteSessionToken
+	SessionToken       PlaceAutocompleteSessionToken
+	SessionTokenString string
 	// Region is the region code, specified as a ccTLD (country code top-level domain)
 	// two-character value. Most ccTLD codes are identical to ISO 3166-1 codes, with
 	// some exceptions. This parameter will only influence, not fully restrict, results.
@@ -703,8 +708,13 @@ func (r *PlaceAutocompleteRequest) params() url.Values {
 
 	q.Set("input", r.Input)
 
-	if st := uuid.UUID(r.SessionToken).String(); st != "00000000-0000-0000-0000-000000000000" {
-		q.Set("sessiontoken", st)
+	if r.SessionTokenString != "" {
+		q.Set("sessiontoken", r.SessionTokenString)
+
+	} else {
+		if st := uuid.UUID(r.SessionToken).String(); st != "00000000-0000-0000-0000-000000000000" {
+			q.Set("sessiontoken", st)
+		}
 	}
 
 	if r.Offset > 0 {
@@ -791,7 +801,8 @@ type PlaceAutocompleteRequest struct {
 	StrictBounds bool
 	// SessionToken is a token that means you will get charged by autocomplete session
 	// instead of by character for Autocomplete
-	SessionToken PlaceAutocompleteSessionToken
+	SessionToken       PlaceAutocompleteSessionToken
+	SessionTokenString string
 }
 
 var placesPhotoAPI = &apiConfig{
